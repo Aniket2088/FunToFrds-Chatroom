@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fun2Frds Chat Dashboard</title>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #FF6B8B;
+      --secondary: #FFD166;
+      --accent: #118AB2;
+      --dark: #073B4C;
+      --light: #F9F7F3;
+      --success: #06D6A0;
+      --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      --gradient-reverse: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--gradient);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: var(--dark);
+    }
+
+    /* Animations */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-20px);}
+      60% {transform: translateY(-10px);}
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    /* Header Styles */
+    .dashboard-header {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    .logo::before {
+      content: "💬";
+      font-size: 24px;
+      animation: bounce 2s infinite;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: rotate(10deg);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main Content Styles */
+    .dashboard-container {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      gap: 20px;
+      height: calc(100vh - 70px);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 20%;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar-header h2 {
+      font-size: 18px;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .create-room-btn {
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .create-room-btn:hover {
+      transform: rotate(90deg) scale(1.1);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .rooms-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .room-item {
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .room-item:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateX(5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .room-item.active {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .room-info {
+      flex: 1;
+    }
+
+    .room-name {
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .room-private-icon {
+      font-size: 12px;
+      color: var(--primary);
+    }
+
+    .room-item.active .room-private-icon {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .room-last-message {
+      font-size: 12px;
+      color: #777;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .room-item.active .room-last-message {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .room-meta {
+      text-align: right;
+    }
+
+    .room-time {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .room-item.active .room-time {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .room-unread {
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    .room-item.active .room-unread {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    /* Chat Area Styles */
+    .chat-area {
+      width: 80%;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .chat-area:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Empty State */
+    .empty-chat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 30px;
+      color: #666;
+    }
+
+    .empty-chat-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-chat h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .empty-chat p {
+      margin-bottom: 25px;
+      max-width: 400px;
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .create-first-room {
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-first-room:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      animation: pulse 1s infinite;
+    }
+
+    /* Active Chat */
+    .chat-header {
+      padding: 20px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.7);
+    }
+    
+    .chat-header-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-participants {
+      font-size: 14px;
+      color: var(--accent);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+    }
+    
+    .chat-participants:hover {
+      color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ff6b8b' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 70%;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .message.own {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-content {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 14px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.4;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .message-content:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.own .message-content {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-info {
+      display: flex;
+      gap: 8px;
+      margin-top: 5px;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    .chat-input-container {
+      padding: 20px;
+      border-top: 2px solid rgba(0, 0, 0, 0.05);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 12px;
+    }
+
+    .message-input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
+    }
+
+    .send-btn {
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      padding: 0 25px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      display: none;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .modal-header h2 {
+      color: var(--dark);
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-header p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e1e1e1;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.2);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    .checkmark {
+      width: 20px;
+      height: 20px;
+      background: #f5f5f5;
+      border: 2px solid #e1e1e1;
+      border-radius: 5px;
+      margin-right: 10px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: bold;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 14px;
+      background: #f1f1f1;
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      background: #e5e5e5;
+      transform: translateY(-2px);
+    }
+
+    .btn-create {
+      flex: 1;
+      padding: 14px;
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-create:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .alert {
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-notice {
+      background-color: rgba(6, 214, 160, 0.2);
+      color: #055a45;
+      border: 1px solid rgba(6, 214, 160, 0.3);
+    }
+
+    .alert-alert {
+      background-color: rgba(248, 215, 218, 0.3);
+      color: #721c24;
+      border: 1px solid rgba(245, 198, 203, 0.3);
+    }
+    
+    .sign-out-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sign-out-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Requests Sidebar */
+    .requests-sidebar {
+      position: fixed;
+      right: -300px;
+      top: 70px;
+      width: 300px;
+      height: calc(100vh - 70px);
+      background: white;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+      transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 999;
+      padding: 20px;
+      overflow-y: auto;
+      border-radius: 20px 0 0 20px;
+    }
+
+    .requests-sidebar.open {
+      right: 0;
+    }
+
+    .requests-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .requests-header h3 {
+      margin: 0;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .close-requests {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+      transition: all 0.3s ease;
+    }
+
+    .close-requests:hover {
+      color: var(--primary);
+      transform: rotate(90deg);
+    }
+
+    .request-item {
+      padding: 15px;
+      margin-bottom: 12px;
+      border: 1px solid #eee;
+      border-radius: 15px;
+      background: #fafafa;
+      transition: all 0.3s ease;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .request-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .request-user {
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--dark);
+    }
+
+    .request-time {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .request-btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .request-approve {
+      background: var(--success);
+      color: white;
+    }
+
+    .request-approve:hover {
+      background: #05b389;
+      transform: translateY(-2px);
+    }
+
+    .request-reject {
+      background: var(--primary);
+      color: white;
+    }
+
+    .request-reject:hover {
+      background: #e05a7a;
+      transform: translateY(-2px);
+    }
+
+    .requests-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .requests-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .request-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    .no-requests {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+    }
+
+    /* Participants Modal */
+    .participants-modal .modal {
+      max-width: 500px;
+    }
+
+    .participants-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .participant-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      transition: all 0.3s ease;
+    }
+
+    .participant-item:hover {
+      background: rgba(0, 0, 0, 0.03);
+      transform: translateX(5px);
+    }
+
+    .participant-item:last-child {
+      border-bottom: none;
+    }
+
+    .participant-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      margin-right: 15px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .participant-info {
+      flex: 1;
+    }
+
+    .participant-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+
+    .participant-status {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .status-online {
+      color: var(--success);
+    }
+
+    .status-offline {
+      color: #999;
+    }
+
+    .no-participants {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+    }
+
+    /* Loading states */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      flex-direction: column;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .send-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+        height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 200px;
+        margin-bottom: 10px;
+      }
+
+      .chat-area {
+        width: 100%;
+        min-height: 400px;
+      }
+
+      .dashboard-header {
+        padding: 10px 15px;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .user-menu {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .room-item {
+        padding: 10px 12px;
+      }
+
+      .room-name {
+        font-size: 14px;
+      }
+
+      .room-last-message {
+        font-size: 11px;
+        max-width: 100px;
+      }
+
+      .message {
+        max-width: 85%;
+      }
+
+      .chat-messages {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .message-content {
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+
+      .chat-input-container {
+        padding: 10px;
+      }
+
+      .modal {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .requests-sidebar {
+        width: 250px;
+      }
+      
+      .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .chat-header-info {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-header {
+        text-align: center;
+      }
+
+      .logo {
+        font-size: 22px;
+      }
+
+      .sidebar-header h2 {
+        font-size: 16px;
+      }
+
+      .chat-title {
+        font-size: 16px;
+      }
+
+      .chat-participants {
+        font-size: 12px;
+      }
+
+      .message-input {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .send-btn {
+        padding: 0 15px;
+        font-size: 14px;
+      }
+
+      .requests-sidebar {
+        width: 100%;
+        right: -100%;
+      }
+      
+      .participants-modal .modal {
+        margin: 10px;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="logo">Fun2Frds</div>
+    <div class="user-menu">
+      <% if current_user %>
+        <span>Hello, <%= current_user.name %></span>
+        <button class="requests-btn" id="requests-btn" title="View join requests">
+          <span class="request-count" id="request-count">0</span>
+          📨
+        </button>
+        <div class="user-avatar"><%= current_user.name[0].upcase %></div>
+        <%= link_to 'Sign Out', signout_path, method: :get, class: 'sign-out-btn' %>
+      <% else %>
+        <span>Please sign in</span>
+        <%= link_to 'Sign In', signin_path, class: 'sign-out-btn' %>
+      <% end %>
+    </div>
+  </header>
+
+  <!-- Requests Sidebar -->
+  <div class="requests-sidebar" id="requests-sidebar">
+    <div class="requests-header">
+      <h3>Join Requests</h3>
+      <button class="close-requests" id="close-requests">×</button>
+    </div>
+    <div class="requests-list" id="requests-list">
+      <div class="no-requests">No pending requests</div>
+    </div>
+  </div>
+
+    <!-- Participants Modal -->
+  <div class="modal-overlay participants-modal" id="participants-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Participants in <span id="participants-room-name"></span></h2>
+        <p>All users who have access to this room</p>
+      </div>
+      <div class="participants-list" id="participants-list">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Loading participants...</p>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="close-participants-modal">Close</button>
+      </div>
+    </div>
+  </div>
+  <!-- Main Content -->
+  <div class="dashboard-container">
+    <!-- Sidebar with Chat Rooms -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>Chat Rooms</h2>
+        <button class="create-room-btn" id="create-room-btn">+</button>
+      </div>
+      <div class="rooms-list">
+        <% if @rooms.any? %>
+          <% @rooms.each do |room| %>
+            <div class="room-item <%= 'active' if @room_selected == room %>" 
+                 data-room-id="<%= room.id %>" 
+                 data-private="<%= room.private? %>">
+              <div class="room-info">
+                <div class="room-name">
+                  <%= room.name %>
+                  <% if room.private? %>
+                    <span class="room-private-icon" title="Private Room">🔒</span>
+                  <% end %>
+                </div>
+                <div class="room-last-message">
+                  <% if room.last_message %>
+                    <%= truncate(room.last_message.content, length: 30) %>
+                  <% else %>
+                    No messages yet
+                  <% end %>
+                </div>
+              </div>
+              <div class="room-meta">
+                <div class="room-time">
+                  <% if room.last_message %>
+                    <%= time_ago_in_words(room.last_message.created_at) %> ago
+                  <% end %>
+                </div>
+                <% if room.unread_messages_count(current_user) > 0 %>
+                  <div class="room-unread"><%= room.unread_messages_count(current_user) %></div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <p>No chat rooms yet. Create one to get started!</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+      <% if @room_selected %>
+        <!-- Active Chat -->
+        <div class="active-chat">
+          <div class="chat-header">
+            <div class="chat-header-info">
+              <div class="chat-title">
+                <%= @room_selected.name %>
+                <% if @room_selected.private? %>
+                  <span class="room-private-icon" title="Private Room">🔒</span>
+                <% end %>
+              </div>
+              <div class="chat-participants" id="view-participants-btn" data-room-id="<%= @room_selected.id %>">
+                👥 <%= @room_selected.users.distinct.count %> participants - View all
+              </div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <% if @messages && @messages.any? %>
+              <% @messages.each do |message| %>
+                <div class="message <%= 'own' if message.user == current_user %>">
+                  <div class="message-avatar"><%= message.user.name[0].upcase %></div>
+                  <div class="message-content">
+                    <%= message.content %>
+                    <div class="message-info">
+                      <span class="message-sender"><%= message.user == current_user ? 'You' : message.user.name %></span>
+                      <span class="message-time"><%= message.created_at.strftime('%H:%M') %></span>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="empty-message">
+                <p>No messages yet. Start the conversation!</p>
+              </div>
+            <% end %>
+          </div>
+          <div class="chat-input-container">
+            <%= form_for [@room_selected, Message.new], html: { class: "chat-input-form" } do |form| %>
+              <%= form.text_field :content, class: "message-input", placeholder: "Type your message...", required: true %>
+              <%= form.submit "Send", class: "send-btn" %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <!-- Empty State (shown when no room is selected) -->
+        <div class="empty-chat">
+          <div class="empty-chat-icon">💬</div>
+          <h2>No chat room selected</h2>
+          <p>Select a chat room from the sidebar or create a new one to start messaging.</p>
+          <button class="create-first-room" id="create-first-room-btn">Create New Chat Room</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Create Room Modal -->
+  <div class="modal-overlay" id="create-room-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Create New Chat Room</h2>
+        <p>Start a new conversation with your friends</p>
+      </div>
+      <%= form_for(@room || Room.new, url: rooms_path) do |form| %>
+        <% if @room && @room.errors.any? %>
+          <div class="error-messages">
+            <% @room.errors.full_messages.each do |message| %>
+              <div class="error-message"><%= message %></div>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <div class="form-group">
+          <%= form.label :name, "Room Name" %>
+          <%= form.text_field :name, required: true, placeholder: "Enter room name" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :description, "Description (Optional)" %>
+          <%= form.text_area :description, placeholder: "What's this room about?" %>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <%= form.check_box :private %>
+            <span class="checkmark"></span>
+            Private Room (requires approval to join)
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cancel-create-room">Cancel</button>
+          <%= form.submit "Create Room", class: "btn-create" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+   <script>
+// Store polling intervals
+let pollingIntervals = {};
+
+// DOM Elements
+const roomItems = document.querySelectorAll('.room-item');
+const createRoomBtn = document.getElementById('create-room-btn');
+const createFirstRoomBtn = document.getElementById('create-first-room-btn');
+const createRoomModal = document.getElementById('create-room-modal');
+const cancelCreateRoom = document.getElementById('cancel-create-room');
+const requestsBtn = document.getElementById('requests-btn');
+const requestsSidebar = document.getElementById('requests-sidebar');
+const closeRequests = document.getElementById('close-requests');
+const requestsList = document.getElementById('requests-list');
+const requestCount = document.getElementById('request-count');
+const viewParticipantsBtn = document.getElementById('view-participants-btn');
+const participantsModal = document.getElementById('participants-modal');
+const closeParticipantsModal = document.getElementById('close-participants-modal');
+const participantsList = document.getElementById('participants-list');
+const participantsRoomName = document.getElementById('participants-room-name');
+
+// Scroll to bottom of chat messages on initial load
+const chatMessages = document.getElementById('chat-messages');
+if (chatMessages) {
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Show active chat when a room is selected
+roomItems.forEach(room => {
+  room.addEventListener('click', () => {
+    const roomId = room.getAttribute('data-room-id');
+    const isPrivate = room.getAttribute('data-private') === 'true';
+    
+    // Remove active class from all rooms
+    roomItems.forEach(r => r.classList.remove('active'));
+    
+    // Add active class to clicked room
+    room.classList.add('active');
+    
+    // Handle room access based on privacy
+    handleRoomAccess(roomId, isPrivate);
+  });
+});
+
+// Function to handle room access
+function handleRoomAccess(roomId, isPrivate) {
+  if (!isPrivate) {
+    loadRoomMessages(roomId);
+    return;
+  }
+
+  // Check if user can access the private room
+  fetch(`/rooms/${roomId}/can_access`, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.can_access) {
+      // User has access to the private room
+      loadRoomMessages(roomId);
+    } else if (data.has_pending_request) {
+      // User has a pending request
+      showRequestPendingModal();
+    } else {
+      // User needs to request access
+      showJoinRequestModal(roomId);
+    }
+  })
+  .catch(error => {
+    console.error('Error checking room access:', error);
+    alert('Error checking room access. Please try again.');
+  });
+}
+
+// Show join request modal
+function showJoinRequestModal(roomId) {
+  const modalHtml = `
+    <div class="modal-overlay" id="join-request-modal" style="display: flex;">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Private Room</h2>
+          <p>This room requires approval to join</p>
+        </div>
+        <div class="modal-actions" style="justify-content: center; gap: 20px;">
+          <button class="btn-cancel" onclick="closeJoinRequestModal()">Cancel</button>
+          <button class="btn-create" onclick="sendJoinRequest(${roomId})">Request to Join</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to body
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// Close join request modal
+function closeJoinRequestModal() {
+  const modal = document.getElementById('join-request-modal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+// Show request pending modal
+function showRequestPendingModal() {
+  alert('Your join request is pending approval. Please wait for the room owner to approve your request.');
+}
+
+// Function to load room messages
+function loadRoomMessages(roomId) {
+  // Show loading state
+  document.querySelector('.chat-area').innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading messages...</p>
+    </div>
+  `;
+  
+  fetch(`/rooms/${roomId}/messages`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to load messages');
+      }
+      return response.json();
+    })
+    .then(messages => {
+      updateChatArea(roomId, messages);
+      // Start polling for new messages
+      startPollingForNewMessages(roomId);
+    })
+    .catch(error => {
+      console.error('Error loading messages:', error);
+      document.querySelector('.chat-area').innerHTML = `
+        <div class="empty-chat">
+          <div class="empty-chat-icon">⚠️</div>
+          <h2>Error Loading Messages</h2>
+          <p>Could not load messages. Please try again.</p>
+          <button onclick="loadRoomMessages(${roomId})" class="create-first-room">Retry</button>
+        </div>
+      `;
+    });
+}
+
+// Start polling for new messages
+function startPollingForNewMessages(roomId) {
+  // Clear any existing polling for this room
+  if (pollingIntervals[roomId]) {
+    clearInterval(pollingIntervals[roomId]);
+  }
+  
+  // Poll every 3 seconds for new messages
+  pollingIntervals[roomId] = setInterval(() => {
+    checkForNewMessages(roomId);
+  }, 1000);
+}
+
+// Check for new messages
+function checkForNewMessages(roomId) {
+  const lastMessageId = getLastMessageId();
+  
+  fetch(`/rooms/${roomId}/new_messages?last_id=${lastMessageId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to check for new messages');
+      }
+      return response.json();
+    })
+    .then(messages => {
+      if (messages && messages.length > 0) {
+        // Add new messages to the chat
+        messages.forEach(message => {
+          addMessageToChat(message);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error checking for new messages:', error);
+    });
+}
+
+// Get the last message ID from the current chat
+function getLastMessageId() {
+  const messages = document.querySelectorAll('.message');
+  if (messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+    return lastMessage.getAttribute('data-message-id') || 0;
+  }
+  return 0;
+}
+
+// Function to update the chat area
+function updateChatArea(roomId, messages) {
+  const roomItem = document.querySelector(`.room-item[data-room-id="${roomId}"]`);
+  const roomName = roomItem.querySelector('.room-name').textContent;
+  const isPrivate = roomItem.getAttribute('data-private') === 'true';
+  
+  // Update messages area
+  let messagesHtml = '';
+  if (messages && messages.length > 0) {
+    messages.forEach(message => {
+      const isOwn = message.user_id === <%= current_user&.id || 'null' %>;
+      messagesHtml += `
+        <div class="message ${isOwn ? 'own' : ''}" data-message-id="${message.id}">
+          <div class="message-avatar">${message.user_name[0].toUpperCase()}</div>
+          <div class="message-content">
+            ${message.content}
+            <div class="message-info">
+              <span class="message-sender">${isOwn ? 'You' : message.user_name}</span>
+              <span class="message-time">${message.time}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    messagesHtml = '<div class="empty-message"><p>No messages yet. Start the conversation!</p></div>';
+  }
+  
+  // Update message form
+  const messageForm = `
+    <form action="/rooms/${roomId}/messages" method="post" class="chat-input-form" id="message-form">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <input type="text" name="message[content]" class="message-input" placeholder="Type your message..." required>
+      <button type="submit" class="send-btn">Send</button>
+    </form>
+  `;
+  
+  // Update the chat area
+  document.querySelector('.chat-area').innerHTML = `
+    <div class="active-chat">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-title">
+            ${roomName}
+            ${isPrivate ? '<span class="room-private-icon" title="Private Room">🔒</span>' : ''}
+          </div>
+          <div class="chat-participants" id="view-participants-btn" data-room-id="${roomId}">
+            👥 View participants
+          </div>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages">${messagesHtml}</div>
+      <div class="chat-input-container">${messageForm}</div>
+    </div>
+  `;
+  
+  // Scroll to bottom of messages
+  const newChatMessages = document.getElementById('chat-messages');
+  if (newChatMessages) {
+    newChatMessages.scrollTop = newChatMessages.scrollHeight;
+  }
+  
+  // Add event listener to the message form
+  const messageFormElement = document.getElementById('message-form');
+  if (messageFormElement) {
+    messageFormElement.addEventListener('submit', handleMessageSubmit);
+  }
+  
+  // Add event listener to the participants button
+  const newViewParticipantsBtn = document.getElementById('view-participants-btn');
+  if (newViewParticipantsBtn) {
+    newViewParticipantsBtn.addEventListener('click', function() {
+      const roomId = this.getAttribute('data-room-id');
+      loadParticipants(roomId);
+    });
+  }
+}
+
+// Function to add a message to the chat UI
+function addMessageToChat(messageData) {
+  const chatMessages = document.getElementById('chat-messages');
+  const currentUserId = <%= current_user&.id || 'null' %>;
+  const isOwn = messageData.user_id === currentUserId;
+  
+  const messageElement = document.createElement('div');
+  messageElement.className = `message ${isOwn ? 'own' : ''}`;
+  messageElement.setAttribute('data-message-id', messageData.id);
+  messageElement.innerHTML = `
+    <div class="message-avatar">${messageData.user_name[0].toUpperCase()}</div>
+    <div class="message-content">
+      ${messageData.content}
+      <div class="message-info">
+        <span class="message-sender">${isOwn ? 'You' : messageData.user_name}</span>
+        <span class="message-time">${messageData.time}</span>
+      </div>
+    </div>
+  `;
+  
+  // Remove empty message if it exists
+  const emptyMessage = chatMessages.querySelector('.empty-message');
+  if (emptyMessage) {
+    emptyMessage.remove();
+  }
+  
+  chatMessages.appendChild(messageElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Function to handle message submission
+function handleMessageSubmit(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const messageInput = form.querySelector('input[name="message[content]"]');
+  const sendBtn = form.querySelector('.send-btn');
+  const messageContent = messageInput.value.trim();
+  
+  if (!messageContent) return;
+  
+  // Show loading state
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Sending...';
+  
+  const formData = new FormData();
+  formData.append('authenticity_token', form.querySelector('input[name="authenticity_token"]').value);
+  formData.append('message[content]', messageContent);
+  
+  fetch(form.action, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    // Handle authentication issues
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/signin';
+      throw new Error('Please sign in to send messages');
+    }
+    
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return response.json().then(err => { throw err; });
+      } else {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+    }
+    
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Server returned non-JSON response');
+    }
+    
+    return response.json();
+  })
+  .then(message => {
+    if (message.errors) {
+      console.error('Error sending message:', message.errors);
+      alert('Error: ' + (message.errors.content || message.errors[0]));
+      return;
+    }
+    
+    // Clear the input field
+    messageInput.value = '';
+  })
+  .catch(error => {
+    console.error('Error sending message:', error);
+    if (error.message.includes('Authentication') || error.message.includes('sign in')) {
+      alert('Please sign in to send messages');
+    } else {
+      alert('Error sending message. Please try again.');
+    }
+  })
+  .finally(() => {
+    // Reset button state
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send';
+  });
+}
+
+// Send join request
+function sendJoinRequest(roomId) {
+  closeJoinRequestModal(); // Close the modal first
+  
+  fetch(`/rooms/${roomId}/room_requests`, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.errors) {
+      alert('Error: ' + data.errors.join(', '));
+    } else {
+      alert('Join request sent successfully! The room owner will be notified.');
+    }
+  })
+  .catch(error => {
+    console.error('Error sending join request:', error);
+    alert('Error sending join request');
+  });
+}
+
+// Show participants modal
+function loadParticipants(roomId) {
+  // Show loading state
+  participantsList.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading participants...</p>
+    </div>
+  `;
+  
+  // Show modal
+  participantsModal.style.display = 'flex';
+  
+  // Set room name
+  const roomItem = document.querySelector(`.room-item[data-room-id="${roomId}"]`);
+  if (roomItem) {
+    const roomName = roomItem.querySelector('.room-name').textContent;
+    participantsRoomName.textContent = roomName;
+  }
+  
+  // Try to fetch participants from server
+  fetch(`/rooms/${roomId}/participants`, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    if (!response.ok) {
+      // If server returns an error, use client-side fallback
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(participants => {
+    displayParticipants(participants);
+  })
+  .catch(error => {
+    console.error('Error loading participants from server:', error);
+    // Fallback: Extract participants from the messages in the chat
+    extractParticipantsFromMessages(roomId);
+  });
+}
+
+// Fallback function to extract participants from messages
+function extractParticipantsFromMessages(roomId) {
+  try {
+    const messages = document.querySelectorAll('.message');
+    const participantsMap = new Map();
+    
+    // Get current user info
+    const currentUser = {
+      id: <%= current_user&.id || 'null' %>,
+      name: '<%= current_user&.name || "You" %>'
+    };
+    
+    // Extract participants from messages
+    messages.forEach(message => {
+      const senderElement = message.querySelector('.message-sender');
+      const avatarElement = message.querySelector('.message-avatar');
+      
+      if (senderElement && avatarElement) {
+        const senderName = senderElement.textContent.trim();
+        const senderInitial = avatarElement.textContent.trim();
+        const isOwnMessage = message.classList.contains('own');
+        
+        // For own messages, use the current user's ID
+        if (isOwnMessage) {
+          participantsMap.set(currentUser.id, {
+            id: currentUser.id,
+            name: currentUser.name
+          });
+        } else {
+          // For other users, generate a unique ID based on name and initial
+          const participantId = `${senderName}-${senderInitial}`;
+          
+          if (!participantsMap.has(participantId)) {
+            participantsMap.set(participantId, {
+              id: participantId,
+              name: senderName
+            });
+          }
+        }
+      }
+    });
+    
+    // Convert map to array
+    const participants = Array.from(participantsMap.values());
+    
+    // Display the participants
+    displayParticipants(participants);
+  } catch (error) {
+    console.error('Error extracting participants from messages:', error);
+    participantsList.innerHTML = `
+      <div class="no-participants">
+        <p>Unable to load participants list.</p>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+}
+
+// Function to display participants
+function displayParticipants(participants) {
+  if (!participants || participants.length === 0) {
+    participantsList.innerHTML = '<div class="no-participants">No participants found</div>';
+    return;
+  }
+
+  let participantsHtml = '';
+  participants.forEach(participant => {
+    participantsHtml += `
+      <div class="participant-item">
+        <div class="participant-avatar">${participant.name ? participant.name[0].toUpperCase() : 'U'}</div>
+        <div class="participant-info">
+          <div class="participant-name">${participant.name || 'Unknown User'}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  participantsList.innerHTML = participantsHtml;
+}
+
+// Toggle requests sidebar
+if (requestsBtn && requestsSidebar) {
+  requestsBtn.addEventListener('click', () => {
+    requestsSidebar.classList.toggle('open');
+    loadRoomRequests();
+  });
+}
+
+if (closeRequests) {
+  closeRequests.addEventListener('click', () => {
+    requestsSidebar.classList.remove('open');
+  });
+}
+
+// Load room requests
+function loadRoomRequests() {
+  fetch('/my_room_requests', {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(requests => {
+    updateRequestCount(requests.length);
+    displayRequests(requests);
+  })
+  .catch(error => {
+    console.error('Error loading requests:', error);
+    requestsList.innerHTML = '<div class="no-requests">Error loading requests</div>';
+  });
+}
+
+function updateRequestCount(count) {
+  if (requestCount) {
+    requestCount.textContent = count;
+    requestCount.style.display = count > 0 ? 'flex' : 'none';
+  }
+}
+
+function displayRequests(requests) {
+  if (requests.length === 0) {
+    requestsList.innerHTML = '<div class="no-requests">No pending requests</div>';
+    return;
+  }
+
+  let requestsHtml = '';
+  requests.forEach(request => {
+    requestsHtml += `
+      <div class="request-item" data-request-id="${request.id}">
+        <div class="request-user">${request.user_name} wants to join "${request.room_name}"</div>
+        <div class="request-time">${request.created_at}</div>
+        <div class="request-actions">
+          <button class="request-btn request-approve" onclick="approveRequest(${request.id}, ${request.room_id})">Approve</button>
+          <button class="request-btn request-reject" onclick="rejectRequest(${request.id}, ${request.room_id})">Reject</button>
+        </div>
+      </div>
+    `;
+  });
+
+  requestsList.innerHTML = requestsHtml;
+}
+
+// Approve request with correct URL
+function approveRequest(requestId, roomId) {
+  fetch(`/rooms/${roomId}/room_requests/${requestId}/approve`, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+      'Accept': 'application/json',
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.errors) {
+      alert('Error: ' + data.errors.join(', '));
+    } else {
+      document.querySelector(`.request-item[data-request-id="${requestId}"]`).remove();
+      loadRoomRequests(); // Reload requests
+      alert('Request approved successfully!');
+    }
+  })
+  .catch(error => {
+    console.error('Error approving request:', error);
+    alert('Error approving request');
+  });
+}
+
+// Reject request with correct URL
+function rejectRequest(requestId, roomId) {
+  fetch(`/rooms/${roomId}/room_requests/${requestId}/reject`, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+      'Accept': 'application/json',
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.errors) {
+      alert('Error: ' + data.errors.join(', '));
+    } else {
+      document.querySelector(`.request-item[data-request-id="${requestId}"]`).remove();
+      loadRoomRequests(); // Reload requests
+      alert('Request rejected successfully!');
+    }
+  })
+  .catch(error => {
+    console.error('Error rejecting request:', error);
+    alert('Error rejecting request');
+  });
+}
+
+// Close participants modal
+if (closeParticipantsModal) {
+  closeParticipantsModal.addEventListener('click', () => {
+    participantsModal.style.display = 'none';
+  });
+}
+
+// Close modal when clicking outside
+if (participantsModal) {
+  participantsModal.addEventListener('click', (e) => {
+    if (e.target === participantsModal) {
+      participantsModal.style.display = 'none';
+    }
+  });
+}
+
+// Show create room modal
+const showCreateRoomModal = () => {
+  createRoomModal.style.display = 'flex';
+};
+
+if (createRoomBtn) {
+  createRoomBtn.addEventListener('click', showCreateRoomModal);
+}
+
+if (createFirstRoomBtn) {
+  createFirstRoomBtn.addEventListener('click', showCreateRoomModal);
+}
+
+// Hide create room modal
+const hideCreateRoomModal = () => {
+  createRoomModal.style.display = 'none';
+};
+
+if (cancelCreateRoom) {
+  cancelCreateRoom.addEventListener('click', hideCreateRoomModal);
+}
+
+// Close modal when clicking outside
+if (createRoomModal) {
+  createRoomModal.addEventListener('click', (e) => {
+    if (e.target === createRoomModal) {
+      hideCreateRoomModal();
+    }
+  });
+}
+
+// Add event listener to the participants button if it exists
+if (viewParticipantsBtn) {
+  viewParticipantsBtn.addEventListener('click', function() {
+    const roomId = this.getAttribute('data-room-id');
+    loadParticipants(roomId);
+  });
+}
+
+// Auto-hide alerts after 5 seconds
+setTimeout(() => {
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(alert => {
+    alert.style.display = 'none';
+  });
+}, 5000);
+
+// Load initial requests count
+document.addEventListener('DOMContentLoaded', function() {
+  loadRoomRequests();
+});  </script>
+</body>
+</html>

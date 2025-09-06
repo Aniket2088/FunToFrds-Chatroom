@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - ChatApp</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .signup-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+    }
+
+    .signup-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .signup-header h1 {
+      color: #333;
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .signup-header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e1e1;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-signup {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-signup:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-signup:active {
+      transform: translateY(0);
+    }
+
+    .btn-signup:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .login-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .field_with_errors input {
+      border-color: #ff4757;
+    }
+
+    .error-message {
+      color: #ff4757;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <div class="signup-header">
+      <h1>Create Account</h1>
+      <p>Join our chat community today</p>
+    </div>
+
+    <% if flash[:alert] %>
+      <div class="alert alert-error"><%= flash[:alert] %></div>
+    <% end %>
+
+    <% if flash[:notice] %>
+      <div class="alert alert-success"><%= flash[:notice] %></div>
+    <% end %>
+
+    <%= form_for @user do |f| %>
+      <% if @user.errors.any? %>
+        <div class="alert alert-error">
+          <h3><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h3>
+          <ul>
+            <% @user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :name, "Full Name" %>
+        <%= f.text_field :name, required: true, placeholder: "Enter your full name", class: "form-control" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :email, "Email Address" %>
+        <%= f.email_field :email, required: true, placeholder: "Enter your email", class: "form-control" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :password, "Password" %>
+        <%= f.password_field :password, required: true, placeholder: "Create a password (min. 6 characters)", class: "form-control" %>
+      </div>
+
+      <%= f.submit "Create Account", class: "btn-signup", id: "signup-btn" %>
+    <% end %>
+
+    <div class="login-link">
+      Already have an account? <%= link_to "Sign In", signin_path %>
+    </div>
+  </div>
+
+  <script>
+    // Simple form validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      const submitBtn = document.getElementById('signup-btn');
+      
+      if (form) {
+        form.addEventListener('submit', function() {
+          submitBtn.disabled = true;
+          submitBtn.value = 'Creating Account...';
+        });
+      }
+    });
+  </script>
+</body>
+</html>
