@@ -44,7 +44,8 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 # Use these compatible versions that are actually available
-gem 'nokogiri', '1.10.10'
+gem 'nokogiri', '~> 1.13'
+
 gem 'loofah', '2.19.1'  # This version is compatible with rails-html-sanitizer
 gem 'rails-html-sanitizer', '1.0.4'
 gem 'rails-dom-testing', '1.0.9'
